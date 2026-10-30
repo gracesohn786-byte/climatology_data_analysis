@@ -10,7 +10,7 @@ APP_DIR = Path(__file__).resolve().parent
 if str(APP_DIR) not in sys.path:
     sys.path.insert(0, str(APP_DIR))
 
-from components.paths import POSTER_PDF, REPO_ROOT  # noqa: E402
+from components.paths import POSTER_PDF  # noqa: E402
 
 st.set_page_config(
     page_title="Mountain Lapse Rates & EDW",
@@ -44,7 +44,7 @@ with col1:
 with col2:
     st.subheader("Poster reference")
     if POSTER_PDF.is_file():
-        st.caption(f"STARS 2026 poster: `{POSTER_PDF.relative_to(REPO_ROOT)}`")
+        st.caption(f"STARS 2026 poster: `{POSTER_PDF.relative_to(APP_DIR)}`")
         with open(POSTER_PDF, "rb") as f:
             st.download_button(
                 label="Download poster (PDF)",

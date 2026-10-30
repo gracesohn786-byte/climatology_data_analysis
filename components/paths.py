@@ -10,7 +10,7 @@ REPO_ROOT = APP_DIR.parent
 CAUCASUS = REPO_ROOT / "Caucasus_Weather_Stations"
 SENAMHI = REPO_ROOT / "Senamhi_Weather_Stations"
 LASCAR = REPO_ROOT / "Peru_Lascar_EDW_temperature_humidity"
-POSTER_PDF = REPO_ROOT / "poster" / "Stars 2026 poster.pdf"
+POSTER_PDF = APP_DIR / "poster" / "Stars 2026 poster.pdf"
 
 
 def p(*parts: str) -> Path:
