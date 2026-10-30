@@ -1,0 +1,130 @@
+Climatological Lapse Rates and Freezing-Level 
+Dynamics in Caucasus Mountain Network
+Grace Sohn
+Mentors: Rob Hellstrom (Geography) & Misha Elashvili (Mathematics)
+Bridgewater State University
+Abstract
+This research examines long-term temperature-elevation relationships 
+and freezing-level variability using weather station data across an 
+elevation gradient from the Caucasus and Andes mountain networks. 
+Daily observations (raw datasets) were quality-controlled and 
+aggregated into seasonal and annual climatologies. Linear regression 
+between temperature and elevation was used to estimate lapse rates 
+and freezing-level altitude. Results indicate stable but seasonally 
+distinct lapse-rate behavior, with stronger gradients during the cool 
+season and greater variability over time. Freezing-level altitude shows 
+an overall increase over the years with significant interannual variability, 
+highlighting potential implications for glacier melt and 
+thermodynamically warm years. The analysis establishes a baseline 
+framework for evaluating elevation-dependent climate change using 
+observational station networks.
+Methods
+Data Cleaning & Processing
+Daily weather station observations were quality-controlled and 
+standardized prior to analysis. Sentinel missing values (−9999.0) 
+were converted to NaN, and rows containing no valid 
+meteorological information were removed. Variables, units, and 
+timestamps were harmonized across stations.
+Data Aggregation
+Cleaned daily data were aggregated into monthly and annual 
+summaries. 
+Data Completeness Audit
+A completeness assessment was performed to identify 
+analyzable time periods. Months with insufficient observations 
+were flagged as missing, and annual values were calculated 
+only when adequate monthly coverage existed. Analyses were 
+restricted to years with sufficient overlapping data across 
+stations.
+Lapse Rate Modeling
+Regression: Fit z = m × T + b across stations
+o T = that year’s annual mean at each station
+o z = station elevation
+o b = freezing level ( intercept at T = 0 °C) 
+Lapse rate (°C km−1^{-1}−1) was derived as: LR=−1000/m
+Freezing-Level Estimation
+Freezing-level altitude was defined as the elevation 
+corresponding to T=0°C, equal to the regression intercept 
+(FL=b). Annual time series of lapse rate and freezing level were 
+analyzed to evaluate variability and long-term trends.
+. 
+Results
+Annual Lapse Rate
+• Period: 1959–1992 inclusive
+• Per calendar year: For each station, annual mean temperature was derived 
+from the mean of monthly mean temperatures (tmean_c_month) over 
+months with valid data, requiring at least 10 valid months.
+• LR_trend = 0.00203 × year − 4.19 ( °C / km)
+Acknowledgements
+I thank Dr. Hellstrom and Dr. Elashvili for their guidance 
+and support throughout this project. I also thank my team 
+members—Emily, Quinn, and Shayla—for their valuable 
+insights and collaboration.
+Seasonal Lapse Rate
+• Period: 1959–1992 inclusive
+• Per calendar year: the regional mean temperature = average 
+of monthly mean temperatures across all stations. 
+• Warm season: top 4 months by regional mean temperature
+• Cool season: bottom 4 months by regional mean temperature 
+• LR_trend = 0.00203 × year − 4.19 (°C / km)
+**The cool season 
+consistently produces a 
+steeper lapse rate than the 
+warm season in most years 
+Together, these two trends 
+indicate a widening 
+warm/cool divergence over 
+the period, with a gap of 
+~0.2–0.5 °C/km in the 
+1960s growing to ~0.9–1.4 
+°C/km by the late 1980s.
+**The trend line shows the 
+lapse rate increasing very 
+slightly over 1959–1992, at 
+a rate of about +0.002 
+°C/km per year (or roughly 
++0.07 °C/km per decade).
+**Annual regressions show 
+consistently high R² 
+(>0.98) across all years.
+RESULTSABSTRACT
+METHODS
+SIGNIFICANCE
+ACKNOWLEDGEMENTS
+Freezing Level Timeseries
+• Period: 1959–1992 inclusive
+• A rising freezing level implies warmer conditions at elevation, 
+accelerating melt; a falling freezing level implies the reverse.
+• Trend slope: −2.18m/year (total decrease of ~74m over 34 years)
+Maximum FL: 2768m 
+Minimum FL: 2245m 
+Mean FL: ~2453m
+R^2: >0.98 in every year 
+(confirms station network 
+shows stable temp-
+elevation gradient)
+- Long-term Steepening of Annual LR: The weak positive 
+trend of annual LR suggests a gradual strengthening of 
+temperature with elevation  consistent with high elevations 
+warming faster (Elevation Dependent Warming).
+- Strong Seasonal LR Contrast: The cool season LR is 
+consistently greater than the warm season LR across nearly all 
+years  indicates stronger gradients in cool season due to 
+inversions and cold-air pooling. This likely reflects enhanced 
+wintertime atmospheric stability at low elevations, which is
+consistent with broader Northern Hemisphere circulation 
+shifts and ENSO-related variability during this period. In 
+contrast, warm season LR remain relatively stable due to 
+convective mixing and moisture effects. This confirms that
+seasonality controls vertical temperature structure.
+- Freezing Level (FL) Behavior: The mean freezing level is 
+within station elevation range  confirms regression is 
+physically grounded and mountain network captures the 0°C 
+isotherm. Daytime shows higher FL and steeper LR while 
+nighttime shows lower FL and weaker LR  diurnal control
+Summary
+The Caucasus network exhibits a stable vertical 
+temperature structure with clear seasonal asymmetry. The 
+observed cool season LR provide strong evidence for 
+elevation-dependent warming, particularly in winter 
+conditions. These results highlight seasonal atmospheric 
+processes in shaping mountain climate change.
