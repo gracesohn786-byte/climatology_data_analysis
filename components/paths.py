@@ -91,6 +91,35 @@ def caucasus_completeness_summary_path() -> Path:
     )
 
 
+def senamhi_annual_lapse_rate_csv(historical: bool) -> Path:
+    """Annual LR time series: canonical `derived/` names, then v3/v2 alternates.
+
+    Canonical (network OLS, matches Peru Analysis copy text):
+    - `derived/senamhi_annual_lapse_rate_1967_1992.csv`
+    - `derived/senamhi_annual_lapse_rate_2004_2019.csv`
+
+    If only fixed-station or older exports exist, fall back to `annual_lr_v3/` then `annual_LR_v2/`.
+    """
+    if historical:
+        return resolve_under(
+            SENAMHI,
+            "derived/senamhi_annual_lapse_rate_1967_1992.csv",
+            "annual_lr_v3/senamhi_annual_lapse_rate_fixed_trio_1967_1992.csv",
+            "annual_lr_v3/senamhi_annual_lapse_rate_fixed_pair_relaxed_m7_1967_1992.csv",
+            "annual_lr_v3/senamhi_annual_lapse_rate_fixed_pair_hist_relaxed_m6_1967_1992.csv",
+            "annual_lr_v3/senamhi_annual_lapse_rate_fixed_pair_1967_1992.csv",
+            "annual_LR_v2/senamhi_annual_lapse_rate_fixed_pair_1967_1992.csv",
+        )
+    return resolve_under(
+        SENAMHI,
+        "derived/senamhi_annual_lapse_rate_2004_2019.csv",
+        "annual_lr_v3/senamhi_annual_lapse_rate_fixed_trio_2004_2019.csv",
+        "annual_lr_v3/senamhi_annual_lapse_rate_fixed_pair_relaxed_m7_2004_2019.csv",
+        "annual_lr_v3/senamhi_annual_lapse_rate_fixed_pair_2004_2019.csv",
+        "annual_LR_v2/senamhi_annual_lapse_rate_fixed_pair_2004_2019.csv",
+    )
+
+
 def resolve_under(base: Path, *relative_paths: str) -> Path:
     """Return the first existing file under `base`; else the primary path (for error messages).
 

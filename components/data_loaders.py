@@ -12,10 +12,11 @@ from components.paths import (
     SENAMHI,
     caucasus_completeness_summary_path,
     caucasus_derived_csv,
+    senamhi_annual_lapse_rate_csv,
 )
 
 # Bump when path logic changes so Streamlit Cloud does not serve stale empty cached frames.
-_DATA_CACHE_VERSION = "v4_repo_root_fix"
+_DATA_CACHE_VERSION = "v5_senamhi_annual_fallback"
 
 
 def _read_csv(path: Path) -> pd.DataFrame:
@@ -69,8 +70,7 @@ def load_caucasus_completeness_summary() -> pd.DataFrame:
 
 @st.cache_data(show_spinner=False)
 def load_senamhi_annual_lr(window: str, _ver: str = _DATA_CACHE_VERSION) -> pd.DataFrame:
-    name = "senamhi_annual_lapse_rate_1967_1992.csv" if window == "historical" else "senamhi_annual_lapse_rate_2004_2019.csv"
-    return _read_csv(SENAMHI / "derived" / name)
+    return _read_csv(senamhi_annual_lapse_rate_csv(window == "historical"))
 
 
 @st.cache_data(show_spinner=False)
