@@ -53,11 +53,18 @@ def load_caucasus_metadata() -> pd.DataFrame:
     return df
 
 
-@st.cache_data(show_spinner=False)
-def load_caucasus_completeness_summary() -> pd.DataFrame:
-    return _read_csv(
-        CAUCASUS / "derived" / "completeness_audit_1959_1992" / "caucasus_station_completeness_summary_1959_1992.csv"
+def caucasus_completeness_summary_path() -> Path:
+    return (
+        CAUCASUS
+        / "derived"
+        / "completeness_audit_1959_1992"
+        / "caucasus_station_completeness_summary_1959_1992.csv"
     )
+
+
+def load_caucasus_completeness_summary() -> pd.DataFrame:
+    """Not cached: empty result when the file was missing should not be cached forever."""
+    return _read_csv(caucasus_completeness_summary_path())
 
 
 @st.cache_data(show_spinner=False)

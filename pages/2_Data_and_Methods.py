@@ -10,7 +10,10 @@ APP_DIR = Path(__file__).resolve().parent.parent
 if str(APP_DIR) not in sys.path:
     sys.path.insert(0, str(APP_DIR))
 
-from components.data_loaders import load_caucasus_completeness_summary  # noqa: E402
+from components.data_loaders import (  # noqa: E402
+    caucasus_completeness_summary_path,
+    load_caucasus_completeness_summary,
+)
 from components.paths import CAUCASUS  # noqa: E402
 
 st.set_page_config(page_title="Data & Methods", layout="wide")
@@ -76,7 +79,8 @@ st.subheader("Caucasus completeness summary (1959–1992)")
 
 summary = load_caucasus_completeness_summary()
 if summary.empty:
-    st.warning("Completeness summary CSV not found.")
+    exp = caucasus_completeness_summary_path()
+    st.warning(f"Completeness summary CSV not found at:\n`{exp}`")
 else:
     st.dataframe(summary, use_container_width=True, hide_index=True)
 
