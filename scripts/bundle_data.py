@@ -171,6 +171,13 @@ def main() -> None:
             las_src / las_png,
         )
 
+    # Comparison write-ups (Regional Comparison expander)
+    for md_rel in [
+        "annual_LR_analysis/annual_lr_comparison_caucasus_vs_senamhi_historical.md",
+        "seasonal_LR_analysis/seasonal_lr_comparison_caucasus_vs_senamhi_historical.md",
+    ]:
+        _sen_bundle(md_rel, sen_root.joinpath(*Path(md_rel).parts))
+
     def _rel(p: Path) -> str:
         try:
             return str(p.relative_to(repo_root))

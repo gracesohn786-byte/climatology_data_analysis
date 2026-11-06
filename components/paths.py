@@ -248,6 +248,24 @@ def senamhi_png_fl_comparison_caucasus() -> Path:
     )
 
 
+def senamhi_comparison_writeup_paths() -> list[Path]:
+    """Annual and seasonal Caucasus vs SENAMHI comparison markdown (bundle or full repo)."""
+    rels = [
+        "annual_LR_analysis/annual_lr_comparison_caucasus_vs_senamhi_historical.md",
+        "seasonal_LR_analysis/seasonal_lr_comparison_caucasus_vs_senamhi_historical.md",
+    ]
+    found: list[Path] = []
+    for rel in rels:
+        path = _first_existing(
+            SENAMHI.joinpath(*Path(rel).parts),
+            (BUNDLE_DIR / "Senamhi_Weather_Stations").joinpath(*Path(rel).parts),
+            (REPO_ROOT / "Senamhi_Weather_Stations").joinpath(*Path(rel).parts),
+        )
+        if path.is_file():
+            found.append(path)
+    return found
+
+
 def lascar_png_seasonal_timeseries(relaxed: bool) -> Path:
     if relaxed:
         return resolve_under(LASCAR, "seasonal_lr_analysis/lascar_seasonal_lr_timeseries_relaxed_2006_2025.png")
