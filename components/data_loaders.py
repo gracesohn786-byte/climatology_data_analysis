@@ -8,6 +8,9 @@ import streamlit as st
 
 from components.paths import CAUCASUS, LASCAR, SENAMHI
 
+# Bump when path logic changes so Streamlit Cloud does not serve stale empty cached frames.
+_DATA_CACHE_VERSION = "v2_paths"
+
 
 def _read_csv(path: Path) -> pd.DataFrame:
     if not path.is_file():
@@ -16,27 +19,27 @@ def _read_csv(path: Path) -> pd.DataFrame:
 
 
 @st.cache_data(show_spinner=False)
-def load_caucasus_annual_lr() -> pd.DataFrame:
+def load_caucasus_annual_lr(_ver: str = _DATA_CACHE_VERSION) -> pd.DataFrame:
     return _read_csv(CAUCASUS / "derived" / "caucasus_annual_lapse_rate_timeseries_1959_1992.csv")
 
 
 @st.cache_data(show_spinner=False)
-def load_caucasus_seasonal_lr_long() -> pd.DataFrame:
+def load_caucasus_seasonal_lr_long(_ver: str = _DATA_CACHE_VERSION) -> pd.DataFrame:
     return _read_csv(CAUCASUS / "derived" / "caucasus_seasonal_lapse_rate_long_1959_1992.csv")
 
 
 @st.cache_data(show_spinner=False)
-def load_caucasus_seasonal_diag() -> pd.DataFrame:
+def load_caucasus_seasonal_diag(_ver: str = _DATA_CACHE_VERSION) -> pd.DataFrame:
     return _read_csv(CAUCASUS / "derived" / "caucasus_seasonal_lapse_rate_diagnostics_1959_1992.csv")
 
 
 @st.cache_data(show_spinner=False)
-def load_caucasus_fl() -> pd.DataFrame:
+def load_caucasus_fl(_ver: str = _DATA_CACHE_VERSION) -> pd.DataFrame:
     return _read_csv(CAUCASUS / "derived" / "caucasus_freezing_level_timeseries_1959_1992.csv")
 
 
 @st.cache_data(show_spinner=False)
-def load_caucasus_climatology() -> pd.DataFrame:
+def load_caucasus_climatology(_ver: str = _DATA_CACHE_VERSION) -> pd.DataFrame:
     df = _read_csv(CAUCASUS / "derived" / "caucasus_station_annual_climatology_1959_1992.csv")
     if not df.empty and "station_name" in df.columns:
         df = df[~df["station_name"].astype(str).str.startswith("~$")]
@@ -44,7 +47,7 @@ def load_caucasus_climatology() -> pd.DataFrame:
 
 
 @st.cache_data(show_spinner=False)
-def load_caucasus_metadata() -> pd.DataFrame:
+def load_caucasus_metadata(_ver: str = _DATA_CACHE_VERSION) -> pd.DataFrame:
     df = _read_csv(CAUCASUS / "derived" / "station_metadata.csv")
     if not df.empty:
         df = df[~df["station_name"].astype(str).str.startswith("~$")].drop_duplicates(
@@ -68,13 +71,13 @@ def load_caucasus_completeness_summary() -> pd.DataFrame:
 
 
 @st.cache_data(show_spinner=False)
-def load_senamhi_annual_lr(window: str) -> pd.DataFrame:
+def load_senamhi_annual_lr(window: str, _ver: str = _DATA_CACHE_VERSION) -> pd.DataFrame:
     name = "senamhi_annual_lapse_rate_1967_1992.csv" if window == "historical" else "senamhi_annual_lapse_rate_2004_2019.csv"
     return _read_csv(SENAMHI / "derived" / name)
 
 
 @st.cache_data(show_spinner=False)
-def load_senamhi_seasonal_long(window: str, relaxed: bool = True) -> pd.DataFrame:
+def load_senamhi_seasonal_long(window: str, relaxed: bool = True, _ver: str = _DATA_CACHE_VERSION) -> pd.DataFrame:
     if window == "historical":
         fname = (
             "senamhi_seasonal_lapse_rate_long_1967_1992_relaxed_sf50_m3of4.csv"
@@ -91,7 +94,7 @@ def load_senamhi_seasonal_long(window: str, relaxed: bool = True) -> pd.DataFram
 
 
 @st.cache_data(show_spinner=False)
-def load_senamhi_fl(variant: str) -> pd.DataFrame:
+def load_senamhi_fl(variant: str, _ver: str = _DATA_CACHE_VERSION) -> pd.DataFrame:
     mapping = {
         "sf33": "senamhi_freezing_level_timeseries_1967_1992_sf33.csv",
         "sf50": "senamhi_freezing_level_timeseries_1967_1992_sf50.csv",
@@ -101,7 +104,7 @@ def load_senamhi_fl(variant: str) -> pd.DataFrame:
 
 
 @st.cache_data(show_spinner=False)
-def load_senamhi_fl_fixedpair() -> pd.DataFrame:
+def load_senamhi_fl_fixedpair(_ver: str = _DATA_CACHE_VERSION) -> pd.DataFrame:
     path = (
         SENAMHI
         / "FL_timeseries_v2"
@@ -111,7 +114,7 @@ def load_senamhi_fl_fixedpair() -> pd.DataFrame:
 
 
 @st.cache_data(show_spinner=False)
-def load_lascar_seasonal(relaxed: bool = False) -> pd.DataFrame:
+def load_lascar_seasonal(relaxed: bool = False, _ver: str = _DATA_CACHE_VERSION) -> pd.DataFrame:
     fname = (
         "lascar_seasonal_lr_timeseries_relaxed_2006_2025.csv"
         if relaxed
@@ -121,7 +124,7 @@ def load_lascar_seasonal(relaxed: bool = False) -> pd.DataFrame:
 
 
 @st.cache_data(show_spinner=False)
-def load_senamhi_station_sample() -> pd.DataFrame:
+def load_senamhi_station_sample(_ver: str = _DATA_CACHE_VERSION) -> pd.DataFrame:
     """One row per station from any daily clean file (for map)."""
     derived = SENAMHI / "derived"
     rows = []

@@ -8,14 +8,23 @@ APP_DIR = Path(__file__).resolve().parent.parent
 
 
 def _find_repo_root(start: Path) -> Path:
-    """Parent directory containing Caucasus_Weather_Stations (robust if layout shifts)."""
+    """Directory containing Caucasus_Weather_Stations.
+
+    Handles:
+    - Local: repo root with streamlit_app/ subfolder
+    - Streamlit Cloud: app may live at repo root (no streamlit_app) or in streamlit_app/
+    """
     cur = start.resolve()
-    for _ in range(8):
+    for _ in range(10):
         if (cur / "Caucasus_Weather_Stations").is_dir():
             return cur
+        # e.g. cwd is streamlit_app/ but data dirs are siblings at repo root
+        parent = cur.parent
+        if (parent / "Caucasus_Weather_Stations").is_dir():
+            return parent
         if cur.parent == cur:
             break
-        cur = cur.parent
+        cur = parent
     return start.parent
 
 

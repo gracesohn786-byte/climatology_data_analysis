@@ -7,7 +7,7 @@ import streamlit as st
 
 
 def metric_row_lr(df: pd.DataFrame, lr_col: str = "lapse_rate") -> None:
-    if df.empty or lr_col not in df.columns:
+    if df.empty or lr_col not in df.columns or "year" not in df.columns:
         st.warning("Lapse rate data not available.")
         return
     s = df[lr_col].dropna()

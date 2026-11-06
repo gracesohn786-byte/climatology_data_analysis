@@ -18,7 +18,7 @@ from components.data_loaders import (  # noqa: E402
     load_caucasus_seasonal_lr_long,
     load_caucasus_seasonal_diag,
 )
-from components.paths import CAUCASUS  # noqa: E402
+from components.paths import CAUCASUS, REPO_ROOT  # noqa: E402
 from components.sidebar import year_range_slider  # noqa: E402
 from components.static_figures import show_static_expander  # noqa: E402
 
@@ -39,6 +39,14 @@ fl = load_caucasus_fl()
 clim = load_caucasus_climatology()
 diag = load_caucasus_seasonal_diag()
 
+if annual.empty or "year" not in annual.columns:
+    st.error(
+        "Caucasus **derived CSVs are missing** from this deployment. "
+        "Commit `Caucasus_Weather_Stations/derived/` (and related folders) to the GitHub repo used by Streamlit Cloud, "
+        f"or verify the app sees repository root at `{REPO_ROOT}`. "
+        "Expected file: `Caucasus_Weather_Stations/derived/caucasus_annual_lapse_rate_timeseries_1959_1992.csv`."
+    )
+
 tabs = st.tabs(["Overview", "Annual LR", "Seasonal LR", "Freezing level", "Climatology", "Completeness"])
 
 with tabs[0]:
@@ -46,7 +54,11 @@ with tabs[0]:
     if not annual.empty and "lr_climatology" in annual.columns:
         c1.metric("Mean annual LR", f"{annual['lr_climatology'].iloc[0]:.2f} °C/km")
         c2.metric("σ (annual LR)", f"{annual['lr_sigma'].iloc[0]:.2f} °C/km")
-    valid_season = seasonal[seasonal["lapse_rate"].notna()]["year"].nunique() if not seasonal.empty else 0
+    valid_season = (
+        seasonal[seasonal["lapse_rate"].notna()]["year"].nunique()
+        if not seasonal.empty and "year" in seasonal.columns
+        else 0
+    )
     c3.metric("Seasonal valid years", f"{valid_season}", help="Years with ok warm/cool LR")
     st.markdown(
         """
@@ -58,53 +70,62 @@ with tabs[0]:
     )
 
 with tabs[1]:
-    y0, y1 = year_range_slider("Annual LR year range", 1959, 1992, "cauc_annual_yr")
-    show_trend = st.checkbox("Show linear trend line", value=True, key="cauc_ann_trend")
-    metrics.metric_row_lr(annual[(annual["year"] >= y0) & (annual["year"] <= y1)])
-    st.plotly_chart(charts.fig_annual_lr(annual, y0, y1, show_trend), use_container_width=True)
-    st.plotly_chart(charts.fig_r2_timeseries(annual, y0, y1), use_container_width=True)
-    show_static_expander(
-        "Original research figure — annual LR",
-        CAUCASUS / "annual_LR_analysis" / "caucasus_annual_lapse_rate_timeseries_1959_1992.png",
-        "Annual lapse rate with OLS trend (1959–1992). Source: annual_LR_analysis.",
-    )
+    if annual.empty or "year" not in annual.columns:
+        st.warning("Load annual lapse rate CSV to enable this tab.")
+    else:
+        y0, y1 = year_range_slider("Annual LR year range", 1959, 1992, "cauc_annual_yr")
+        show_trend = st.checkbox("Show linear trend line", value=True, key="cauc_ann_trend")
+        metrics.metric_row_lr(annual[(annual["year"] >= y0) & (annual["year"] <= y1)])
+        st.plotly_chart(charts.fig_annual_lr(annual, y0, y1, show_trend), use_container_width=True)
+        st.plotly_chart(charts.fig_r2_timeseries(annual, y0, y1), use_container_width=True)
+        show_static_expander(
+            "Original research figure — annual LR",
+            CAUCASUS / "annual_LR_analysis" / "caucasus_annual_lapse_rate_timeseries_1959_1992.png",
+            "Annual lapse rate with OLS trend (1959–1992). Source: annual_LR_analysis.",
+        )
 
 with tabs[2]:
-    y0, y1 = year_range_slider("Seasonal LR year range", 1959, 1992, "cauc_seas_yr")
-    ylim_choice = st.radio("Y-axis", ["Auto", "4–8 °C/km (poster view)"], horizontal=True, key="cauc_ylim")
-    ylim = (4.0, 8.0) if "4–8" in ylim_choice else None
-    show_tr = st.checkbox("Show per-season OLS trends", value=False, key="cauc_seas_tr")
-    sub = seasonal[(seasonal["year"] >= y0) & (seasonal["year"] <= y1)]
-    metrics.metric_seasonal_means(sub)
-    st.plotly_chart(charts.fig_seasonal_lr(seasonal, y0, y1, ylim=ylim, show_trend=show_tr), use_container_width=True)
-    if not diag.empty:
-        with st.expander("Diagnostics (1992 excluded: station_count)"):
-            st.dataframe(diag[["year", "notes", "n_stations_used", "warm_months", "cool_months"]], hide_index=True)
-    show_static_expander(
-        "Original figure (y-axis 4–8)",
-        CAUCASUS / "seasonal_LR_analysis" / "caucasus_seasonal_lapse_rate_timeseries_1959_1992.png",
-        "Warm (red) vs cool (blue) seasonal LR, 1959–1992.",
-    )
-    show_static_expander(
-        "Original figure (auto y-axis)",
-        CAUCASUS / "seasonal_LR_analysis" / "caucasus_seasonal_lapse_rate_timeseries_1959_1992_old.png",
-        "Earlier export before fixed y-axis limits.",
-    )
+    if seasonal.empty or "year" not in seasonal.columns:
+        st.warning("Load seasonal lapse rate CSV to enable this tab.")
+    else:
+        y0, y1 = year_range_slider("Seasonal LR year range", 1959, 1992, "cauc_seas_yr")
+        ylim_choice = st.radio("Y-axis", ["Auto", "4–8 °C/km (poster view)"], horizontal=True, key="cauc_ylim")
+        ylim = (4.0, 8.0) if "4–8" in ylim_choice else None
+        show_tr = st.checkbox("Show per-season OLS trends", value=False, key="cauc_seas_tr")
+        sub = seasonal[(seasonal["year"] >= y0) & (seasonal["year"] <= y1)]
+        metrics.metric_seasonal_means(sub)
+        st.plotly_chart(charts.fig_seasonal_lr(seasonal, y0, y1, ylim=ylim, show_trend=show_tr), use_container_width=True)
+        if not diag.empty and "year" in diag.columns:
+            with st.expander("Diagnostics (1992 excluded: station_count)"):
+                st.dataframe(diag[["year", "notes", "n_stations_used", "warm_months", "cool_months"]], hide_index=True)
+        show_static_expander(
+            "Original figure (y-axis 4–8)",
+            CAUCASUS / "seasonal_LR_analysis" / "caucasus_seasonal_lapse_rate_timeseries_1959_1992.png",
+            "Warm (red) vs cool (blue) seasonal LR, 1959–1992.",
+        )
+        show_static_expander(
+            "Original figure (auto y-axis)",
+            CAUCASUS / "seasonal_LR_analysis" / "caucasus_seasonal_lapse_rate_timeseries_1959_1992_old.png",
+            "Earlier export before fixed y-axis limits.",
+        )
 
 with tabs[3]:
-    y0, y1 = year_range_slider("Freezing level year range", 1959, 1992, "cauc_fl_yr")
-    show_ci = st.checkbox("Show 95% bootstrap CI", value=True, key="cauc_fl_ci")
-    metrics.metric_fl(fl[(fl["year"] >= y0) & (fl["year"] <= y1)])
-    st.plotly_chart(charts.fig_freezing_level(fl, y0, y1, show_ci=show_ci), use_container_width=True)
-    st.caption(
-        "FL is interpolated within the network elevation range (all years `fl_within_range=True`). "
-        "Wide CI in late 1980s–1992 reflects fewer active stations."
-    )
-    show_static_expander(
-        "Original research figure — freezing level",
-        CAUCASUS / "FL_timeseries_analysis" / "caucasus_freezing_level_timeseries_1959_1992.png",
-        "Annual FL, bootstrap band, linear trend.",
-    )
+    if fl.empty or "year" not in fl.columns:
+        st.warning("Load freezing level CSV to enable this tab.")
+    else:
+        y0, y1 = year_range_slider("Freezing level year range", 1959, 1992, "cauc_fl_yr")
+        show_ci = st.checkbox("Show 95% bootstrap CI", value=True, key="cauc_fl_ci")
+        metrics.metric_fl(fl[(fl["year"] >= y0) & (fl["year"] <= y1)])
+        st.plotly_chart(charts.fig_freezing_level(fl, y0, y1, show_ci=show_ci), use_container_width=True)
+        st.caption(
+            "FL is interpolated within the network elevation range (all years `fl_within_range=True`). "
+            "Wide CI in late 1980s–1992 reflects fewer active stations."
+        )
+        show_static_expander(
+            "Original research figure — freezing level",
+            CAUCASUS / "FL_timeseries_analysis" / "caucasus_freezing_level_timeseries_1959_1992.png",
+            "Annual FL, bootstrap band, linear trend.",
+        )
 
 with tabs[4]:
     options = [

@@ -20,7 +20,7 @@ st.set_page_config(page_title="Data & Methods", layout="wide")
 st.title("Data and Methodology")
 
 st.markdown(
-    """
+    r"""
 ### Data sources
 
 | Region | Input | Period | Elevation span |
@@ -62,7 +62,7 @@ supported by independent tests (not claimed here).
 st.subheader("Seasonal lapse rate (Option A)")
 
 st.markdown(
-    """
+    r"""
 For each calendar year, rank months 1–12 by **regional mean** `tmean_c_month` across stations.  
 **Warm season** = 4 highest months; **cool season** = 4 lowest (disjoint sets).  
 Warm and cool regressions use the **same station set** (intersection with complete seasonal means).
@@ -71,7 +71,7 @@ Warm and cool regressions use the **same station set** (intersection with comple
 |--------------|----------|--------------------------------|
 | Station fraction | ≥ **75%** of network in warm∩cool | **50%** (historical) or **67%** (modern) |
 | Months per season | **4 of 4** required | **3 of 4** in relaxed Peru runs |
-| Elevation check | \|Δ min elev\| < 200 m | Same (0 m when same stations) |
+| Elevation check | Abs(Δ min elevation) < 200 m | Same (0 m when same stations) |
 """
 )
 
