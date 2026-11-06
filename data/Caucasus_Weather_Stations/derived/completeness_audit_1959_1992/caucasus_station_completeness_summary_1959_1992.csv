@@ -1,0 +1,9 @@
+start_year,end_year,expected_months,available_months,missing_months,NaN_months,completeness_percent,usable_years_count,station_id,source_file
+1959,1992,408,405,3,0,99.26470588235294,34,khaishi,khaishi_monthly_clean.csv
+1959,1992,408,400,8,0,98.0392156862745,32,lebarde,lebarde_monthly_clean.csv
+1959,1992,408,387,0,21,94.85294117647058,32,lentekhi,lentekhi_monthly_clean.csv
+1959,1992,408,384,24,0,94.11764705882352,31,mamisoni_pass,mamisoni_pass_monthly_clean.csv
+1959,1992,408,404,4,0,99.01960784313727,33,mestia,mestia_monthly_clean.csv
+1959,1992,408,408,0,0,100.0,34,shovi,shovi_monthly_clean.csv
+1959,1992,408,407,1,0,99.75490196078431,34,tsageri,tsageri_monthly_clean.csv
+1959,1992,408,408,0,0,100.0,34,zugdidi,zugdidi_monthly_clean.csv

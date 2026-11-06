@@ -9,7 +9,7 @@ import streamlit as st
 from components.paths import CAUCASUS, LASCAR, SENAMHI
 
 # Bump when path logic changes so Streamlit Cloud does not serve stale empty cached frames.
-_DATA_CACHE_VERSION = "v2_paths"
+_DATA_CACHE_VERSION = "v3_bundle"
 
 
 def _read_csv(path: Path) -> pd.DataFrame:
@@ -125,7 +125,14 @@ def load_lascar_seasonal(relaxed: bool = False, _ver: str = _DATA_CACHE_VERSION)
 
 @st.cache_data(show_spinner=False)
 def load_senamhi_station_sample(_ver: str = _DATA_CACHE_VERSION) -> pd.DataFrame:
-    """One row per station from any daily clean file (for map)."""
+    """One row per station for the map (bundled slim CSV or from daily_clean)."""
+    slim = SENAMHI / "derived" / "senamhi_stations_map.csv"
+    if slim.is_file():
+        df = pd.read_csv(slim)
+        if {"station_name", "latitude", "longitude"}.issubset(df.columns):
+            return df.rename(columns={"station_name": "station"}).rename(
+                columns={"latitude": "lat", "longitude": "lon"}
+            )
     derived = SENAMHI / "derived"
     rows = []
     for p in sorted(derived.glob("*_daily_clean.csv")):

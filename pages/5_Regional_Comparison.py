@@ -7,11 +7,13 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-APP_DIR = Path(__file__).resolve().parent.parent
-if str(APP_DIR) not in sys.path:
-    sys.path.insert(0, str(APP_DIR))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from bootstrap import ensure_streamlit_path  # noqa: E402
+
+APP_DIR = ensure_streamlit_path()
 
 from components.data_loaders import load_caucasus_annual_lr, load_senamhi_annual_lr  # noqa: E402
+from components.layout import df_kwargs  # noqa: E402
 from components.paths import SENAMHI  # noqa: E402
 from components.static_figures import show_static  # noqa: E402
 
@@ -51,7 +53,7 @@ else:
             {"Aspect": "LR trend (descriptive)", "Caucasus": "Slight rise", "SENAMHI historical": "Slight fall"},
         ]
     )
-    st.dataframe(comp, use_container_width=True, hide_index=True)
+    st.dataframe(comp, hide_index=True, **df_kwargs())
 
 st.subheader("Structural differences")
 st.markdown(

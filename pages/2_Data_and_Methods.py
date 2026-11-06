@@ -6,14 +6,16 @@ from pathlib import Path
 
 import streamlit as st
 
-APP_DIR = Path(__file__).resolve().parent.parent
-if str(APP_DIR) not in sys.path:
-    sys.path.insert(0, str(APP_DIR))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from bootstrap import ensure_streamlit_path  # noqa: E402
+
+APP_DIR = ensure_streamlit_path()
 
 from components.data_loaders import (  # noqa: E402
     caucasus_completeness_summary_path,
     load_caucasus_completeness_summary,
 )
+from components.layout import df_kwargs, img_kwargs  # noqa: E402
 from components.paths import CAUCASUS  # noqa: E402
 
 st.set_page_config(page_title="Data & Methods", layout="wide")
@@ -82,11 +84,11 @@ if summary.empty:
     exp = caucasus_completeness_summary_path()
     st.warning(f"Completeness summary CSV not found at:\n`{exp}`")
 else:
-    st.dataframe(summary, use_container_width=True, hide_index=True)
+    st.dataframe(summary, hide_index=True, **df_kwargs())
 
 heatmap_dir = CAUCASUS / "completeness_audit" / "monthly_grids_1959-1992_(missing_data)"
 pngs = sorted(heatmap_dir.glob("*_1959_1992.png")) if heatmap_dir.is_dir() else []
 if pngs:
     station = st.selectbox("Station monthly availability heatmap", [p.stem for p in pngs])
     chosen = next(p for p in pngs if p.stem == station)
-    st.image(str(chosen), caption=station.replace("_", " "), use_container_width=True)
+    st.image(str(chosen), caption=station.replace("_", " "), **img_kwargs())

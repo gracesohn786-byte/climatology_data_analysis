@@ -6,11 +6,13 @@ from pathlib import Path
 
 import streamlit as st
 
-APP_DIR = Path(__file__).resolve().parent.parent
-if str(APP_DIR) not in sys.path:
-    sys.path.insert(0, str(APP_DIR))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from bootstrap import ensure_streamlit_path  # noqa: E402
+
+APP_DIR = ensure_streamlit_path()
 
 from components import charts, metrics  # noqa: E402
+from components.layout import img_kwargs, plotly_kwargs  # noqa: E402
 from components.data_loaders import (  # noqa: E402
     load_lascar_seasonal,
     load_senamhi_annual_lr,
@@ -46,7 +48,7 @@ with tabs[0]:
     pngs = sorted(miss.glob("*_availability_heatmap.png")) if miss.is_dir() else []
     if pngs:
         pick = st.selectbox("SENAMHI daily→monthly availability", [p.name for p in pngs])
-        st.image(str(miss / pick), use_container_width=True)
+        st.image(str(miss / pick), **img_kwargs())
 
 with tabs[1]:
     window = st.radio("Window", ["historical", "modern"], horizontal=True, format_func=lambda w: "1967–1992" if w == "historical" else "2004–2019")
@@ -60,7 +62,7 @@ with tabs[1]:
         slope = metrics.trend_slope_lr(df)
         if slope is not None:
             st.caption(f"Descriptive OLS slope (full series): {slope:.5f} °C/km per year")
-        st.plotly_chart(charts.fig_annual_lr(df, yr[0], yr[1], True), use_container_width=True)
+        st.plotly_chart(charts.fig_annual_lr(df, yr[0], yr[1], True), **plotly_kwargs())
         png = (
             SENAMHI / "annual_LR_analysis" / "senamhi_annual_lapse_rate_1967_1992.png"
             if window == "historical"
@@ -78,7 +80,7 @@ with tabs[2]:
         yr = year_range_slider("Seasonal LR year range", y0, y1, f"sen_seas_{window}")
         sub = long_df[(long_df["year"] >= yr[0]) & (long_df["year"] <= yr[1])]
         metrics.metric_seasonal_means(sub)
-        st.plotly_chart(charts.fig_seasonal_lr(long_df, yr[0], yr[1], show_trend=True), use_container_width=True)
+        st.plotly_chart(charts.fig_seasonal_lr(long_df, yr[0], yr[1], show_trend=True), **plotly_kwargs())
         png_name = (
             "senamhi_seasonal_lapse_rate_timeseries_1967_1992_relaxed_sf50_m3of4.png"
             if window == "historical"
@@ -112,7 +114,7 @@ with tabs[3]:
         if fl_col in df.columns:
             df = df.rename(columns={fl_col: "freezing_level_m"})
         has_ci = {"fl_ci_lo", "fl_ci_hi"}.issubset(df.columns)
-        st.plotly_chart(charts.fig_freezing_level(df, yr[0], yr[1], show_ci=has_ci), use_container_width=True)
+        st.plotly_chart(charts.fig_freezing_level(df, yr[0], yr[1], show_ci=has_ci), **plotly_kwargs())
         if key == "sf33":
             show_static_expander(
                 "Original figure",
@@ -136,7 +138,7 @@ with tabs[4]:
         y0, y1 = 2006, 2025
         yr = year_range_slider("Lascar seasonal year range", y0, y1, "lascar_yr")
         metrics.metric_seasonal_means(ldf[(ldf["year"] >= yr[0]) & (ldf["year"] <= yr[1])])
-        st.plotly_chart(charts.fig_seasonal_lr(ldf, yr[0], yr[1]), use_container_width=True)
+        st.plotly_chart(charts.fig_seasonal_lr(ldf, yr[0], yr[1]), **plotly_kwargs())
         png = (
             LASCAR / "seasonal_lr_analysis" / "lascar_seasonal_lr_timeseries_relaxed_2006_2025.png"
             if relaxed
@@ -147,4 +149,4 @@ with tabs[4]:
             hp = LASCAR / "seasonal_lr_analysis" / f"completeness_heatmap_{station}.png"
             if hp.is_file():
                 with st.expander(f"Completeness — {station}"):
-                    st.image(str(hp), use_container_width=True)
+                    st.image(str(hp), **img_kwargs())

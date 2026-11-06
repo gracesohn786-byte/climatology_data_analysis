@@ -6,11 +6,13 @@ from pathlib import Path
 
 import streamlit as st
 
-APP_DIR = Path(__file__).resolve().parent.parent
-if str(APP_DIR) not in sys.path:
-    sys.path.insert(0, str(APP_DIR))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from bootstrap import ensure_streamlit_path  # noqa: E402
+
+APP_DIR = ensure_streamlit_path()
 
 from components import charts, metrics  # noqa: E402
+from components.layout import img_kwargs, plotly_kwargs  # noqa: E402
 from components.data_loaders import (  # noqa: E402
     load_caucasus_annual_lr,
     load_caucasus_climatology,
@@ -42,9 +44,10 @@ diag = load_caucasus_seasonal_diag()
 if annual.empty or "year" not in annual.columns:
     st.error(
         "Caucasus **derived CSVs are missing** from this deployment. "
-        "Commit `Caucasus_Weather_Stations/derived/` (and related folders) to the GitHub repo used by Streamlit Cloud, "
-        f"or verify the app sees repository root at `{REPO_ROOT}`. "
-        "Expected file: `Caucasus_Weather_Stations/derived/caucasus_annual_lapse_rate_timeseries_1959_1992.csv`."
+        "Either commit **`streamlit_app/data/Caucasus_Weather_Stations/derived/`** (bundled copies for Cloud) or the "
+        "full tree **`Caucasus_Weather_Stations/derived/`** at repository root, then redeploy. "
+        f"If data is present locally, check that the app resolves paths (repository root detected: `{REPO_ROOT}`). "
+        "Expected: `caucasus_annual_lapse_rate_timeseries_1959_1992.csv`."
     )
 
 tabs = st.tabs(["Overview", "Annual LR", "Seasonal LR", "Freezing level", "Climatology", "Completeness"])
@@ -76,8 +79,8 @@ with tabs[1]:
         y0, y1 = year_range_slider("Annual LR year range", 1959, 1992, "cauc_annual_yr")
         show_trend = st.checkbox("Show linear trend line", value=True, key="cauc_ann_trend")
         metrics.metric_row_lr(annual[(annual["year"] >= y0) & (annual["year"] <= y1)])
-        st.plotly_chart(charts.fig_annual_lr(annual, y0, y1, show_trend), use_container_width=True)
-        st.plotly_chart(charts.fig_r2_timeseries(annual, y0, y1), use_container_width=True)
+        st.plotly_chart(charts.fig_annual_lr(annual, y0, y1, show_trend), **plotly_kwargs())
+        st.plotly_chart(charts.fig_r2_timeseries(annual, y0, y1), **plotly_kwargs())
         show_static_expander(
             "Original research figure — annual LR",
             CAUCASUS / "annual_LR_analysis" / "caucasus_annual_lapse_rate_timeseries_1959_1992.png",
@@ -94,7 +97,9 @@ with tabs[2]:
         show_tr = st.checkbox("Show per-season OLS trends", value=False, key="cauc_seas_tr")
         sub = seasonal[(seasonal["year"] >= y0) & (seasonal["year"] <= y1)]
         metrics.metric_seasonal_means(sub)
-        st.plotly_chart(charts.fig_seasonal_lr(seasonal, y0, y1, ylim=ylim, show_trend=show_tr), use_container_width=True)
+        st.plotly_chart(
+            charts.fig_seasonal_lr(seasonal, y0, y1, ylim=ylim, show_trend=show_tr), **plotly_kwargs()
+        )
         if not diag.empty and "year" in diag.columns:
             with st.expander("Diagnostics (1992 excluded: station_count)"):
                 st.dataframe(diag[["year", "notes", "n_stations_used", "warm_months", "cool_months"]], hide_index=True)
@@ -116,7 +121,7 @@ with tabs[3]:
         y0, y1 = year_range_slider("Freezing level year range", 1959, 1992, "cauc_fl_yr")
         show_ci = st.checkbox("Show 95% bootstrap CI", value=True, key="cauc_fl_ci")
         metrics.metric_fl(fl[(fl["year"] >= y0) & (fl["year"] <= y1)])
-        st.plotly_chart(charts.fig_freezing_level(fl, y0, y1, show_ci=show_ci), use_container_width=True)
+        st.plotly_chart(charts.fig_freezing_level(fl, y0, y1, show_ci=show_ci), **plotly_kwargs())
         st.caption(
             "FL is interpolated within the network elevation range (all years `fl_within_range=True`). "
             "Wide CI in late 1980s–1992 reflects fewer active stations."
@@ -128,14 +133,18 @@ with tabs[3]:
         )
 
 with tabs[4]:
-    options = [
-        ("tmean_c_clim", "Mean daily (monthly mean of daily mean)"),
-        ("tmax_c_clim", "Daytime proxy (Tmax)"),
-        ("tmin_c_clim", "Nighttime proxy (Tmin)"),
-    ]
-    choice = st.selectbox("Temperature series", options, format_func=lambda x: x[1])
-    temp_col, label = choice
-    st.plotly_chart(charts.fig_climatology_scatter(clim, temp_col, label), use_container_width=True)
+    need = {"elevation_m", "station_name", "tmean_c_clim", "tmax_c_clim", "tmin_c_clim"}
+    if clim.empty or not need.issubset(set(clim.columns)):
+        st.warning("Load climatology CSV (`caucasus_station_annual_climatology_1959_1992.csv`) to enable this tab.")
+    else:
+        options = [
+            ("tmean_c_clim", "Mean daily (monthly mean of daily mean)"),
+            ("tmax_c_clim", "Daytime proxy (Tmax)"),
+            ("tmin_c_clim", "Nighttime proxy (Tmin)"),
+        ]
+        choice = st.selectbox("Temperature series", options, format_func=lambda x: x[1])
+        temp_col, label = choice
+        st.plotly_chart(charts.fig_climatology_scatter(clim, temp_col, label), **plotly_kwargs())
     st.markdown(
         """
 | Series | LR (°C/km) | FL (m) — from climatology report |
@@ -162,4 +171,4 @@ with tabs[5]:
     heat_dir = CAUCASUS / "completeness_audit" / "monthly_grids_1959-1992_(missing_data)"
     for p in sorted(heat_dir.glob("*_1959_1992.png")) if heat_dir.is_dir() else []:
         with st.expander(p.stem.replace("_availability_heatmap_1959_1992", "").replace("_", " ").title()):
-            st.image(str(p), use_container_width=True)
+            st.image(str(p), **img_kwargs())

@@ -6,11 +6,13 @@ from pathlib import Path
 
 import streamlit as st
 
-APP_DIR = Path(__file__).resolve().parent.parent
-if str(APP_DIR) not in sys.path:
-    sys.path.insert(0, str(APP_DIR))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from bootstrap import ensure_streamlit_path  # noqa: E402
+
+APP_DIR = ensure_streamlit_path()
 
 from components.data_loaders import load_caucasus_metadata, load_senamhi_station_sample  # noqa: E402
+from components.layout import df_kwargs  # noqa: E402
 from components.poster_text import extract_abstract  # noqa: E402
 from components.paths import POSTER_PDF  # noqa: E402
 
@@ -54,8 +56,8 @@ with tab_c:
     else:
         st.dataframe(
             meta[["station_name", "elevation_m", "latitude", "longitude"]].sort_values("elevation_m"),
-            use_container_width=True,
             hide_index=True,
+            **df_kwargs(),
         )
         map_df = meta.rename(columns={"latitude": "lat", "longitude": "lon"})
         st.map(map_df[["lat", "lon"]], size=20)
@@ -70,7 +72,7 @@ with tab_p:
     )
     sen = load_senamhi_station_sample()
     if not sen.empty:
-        st.dataframe(sen.sort_values("elevation_m"), use_container_width=True, hide_index=True)
+        st.dataframe(sen.sort_values("elevation_m"), hide_index=True, **df_kwargs())
         st.map(sen.rename(columns={"lat": "lat", "lon": "lon"}), size=15)
 
 st.subheader("Why this matters")

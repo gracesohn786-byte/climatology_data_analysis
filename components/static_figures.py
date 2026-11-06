@@ -5,12 +5,14 @@ from pathlib import Path
 
 import streamlit as st
 
+from components.layout import img_kwargs
+
 
 def show_static(path: Path, caption: str) -> None:
     if not path.is_file():
         st.warning(f"Reference figure not found: `{path.name}`")
         return
-    st.image(str(path), caption=caption, use_container_width=True)
+    st.image(str(path), caption=caption, **img_kwargs())
 
 
 def show_static_expander(title: str, path: Path, caption: str) -> None:
