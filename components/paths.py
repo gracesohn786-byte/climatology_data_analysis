@@ -89,3 +89,137 @@ def caucasus_completeness_summary_path() -> Path:
         CAUCASUS / "derived" / name,
         CAUCASUS / name,
     )
+
+
+def resolve_under(base: Path, *relative_paths: str) -> Path:
+    """Return the first existing file under `base`; else the primary path (for error messages).
+
+    Supports alternate folder layouts (e.g. `derived/plots/lapse_rate/` vs top-level analysis folders).
+    """
+    if not relative_paths:
+        raise ValueError("resolve_under requires at least one relative path")
+    for rel in relative_paths:
+        p = base / rel.replace("\\", "/")
+        if p.is_file():
+            return p
+    return base / relative_paths[0].replace("\\", "/")
+
+
+# --- Reference PNGs (original figures) — try canonical paths then repo-specific alternates ---
+
+def caucasus_png_annual_lr() -> Path:
+    return resolve_under(
+        CAUCASUS,
+        "annual_LR_analysis/caucasus_annual_lapse_rate_timeseries_1959_1992.png",
+        "annual_LR_analysis/caucasus_annual_lapse_rate_timeseries_1959_1992_(2).png",
+        "derived/plots/lapse_rate/caucasus_annual_lapse_rate_timeseries_1959_1992.png",
+    )
+
+
+def caucasus_png_seasonal_lr_main() -> Path:
+    return resolve_under(
+        CAUCASUS,
+        "seasonal_LR_analysis/caucasus_seasonal_lapse_rate_timeseries_1959_1992.png",
+        "derived/plots/lapse_rate/caucasus_seasonal_lapse_rate_timeseries_1959_1992.png",
+    )
+
+
+def caucasus_png_seasonal_lr_old() -> Path:
+    return resolve_under(
+        CAUCASUS,
+        "seasonal_LR_analysis/caucasus_seasonal_lapse_rate_timeseries_1959_1992_old.png",
+    )
+
+
+def caucasus_png_freezing_level() -> Path:
+    return resolve_under(
+        CAUCASUS,
+        "FL_timeseries_analysis/caucasus_freezing_level_timeseries_1959_1992.png",
+        "derived/plots/lapse_rate/caucasus_freezing_level_timeseries_1959_1992.png",
+        "derived/plots/lapse_rate/caucasus_freezing_level_timeseries_1959_1992_ylim4000_11000.png",
+        "derived/plots/lapse_rate/caucasus_freezing_level_timeseries_1959_1992_ylim2000_11000.png",
+    )
+
+
+def caucasus_png_climatology_scatter() -> Path:
+    return resolve_under(
+        CAUCASUS,
+        "LR_Elevation_vs_Temp_Analysis/plot/caucasus_lapse_rate_climatology_elevation_vs_temp_1959_1992.png",
+        "LR_Elevation_vs_Temp_Analysis/caucasus_lapse_rate_climatology_elevation_vs_temp_1959_1992.png",
+    )
+
+
+def senamhi_png_annual_lr(historical: bool) -> Path:
+    if historical:
+        return resolve_under(
+            SENAMHI,
+            "annual_LR_analysis/senamhi_annual_lapse_rate_1967_1992.png",
+            "annual_lr_v3/senamhi_annual_lapse_rate_fixed_trio_1967_1992.png",
+            "annual_lr_v3/senamhi_annual_lapse_rate_fixed_pair_relaxed_m7_1967_1992.png",
+            "annual_LR_v2/senamhi_annual_lapse_rate_fixed_pair_1967_1992.png",
+        )
+    return resolve_under(
+        SENAMHI,
+        "annual_LR_analysis/senamhi_annual_lapse_rate_2004_2019.png",
+        "annual_lr_v3/senamhi_annual_lapse_rate_fixed_trio_2004_2019.png",
+        "annual_lr_v3/senamhi_annual_lapse_rate_fixed_pair_relaxed_m7_2004_2019.png",
+        "annual_LR_v2/senamhi_annual_lapse_rate_fixed_pair_2004_2019.png",
+    )
+
+
+def senamhi_png_seasonal_lr_relaxed(historical: bool) -> Path:
+    if historical:
+        return resolve_under(
+            SENAMHI,
+            "seasonal_LR_analysis/senamhi_seasonal_lapse_rate_timeseries_1967_1992_relaxed_sf50_m3of4.png",
+            "seasonal_LR_analysis/senamhi_seasonal_lapse_rate_timeseries_1967_1992_relaxed_sf67_m3of4.png",
+            "seasonal_LR_analysis/senamhi_seasonal_lapse_rate_timeseries_1967_1992.png",
+            "seasonal_lr_v2/senamhi_seasonal_lapse_rate_timeseries_1967_1992_fixed_pair_bv_aija_hist_relaxed_m2of4.png",
+        )
+    return resolve_under(
+        SENAMHI,
+        "seasonal_LR_analysis/senamhi_seasonal_lapse_rate_timeseries_2004_2019_relaxed_sf67_m3of4.png",
+        "seasonal_LR_analysis/senamhi_seasonal_lapse_rate_timeseries_2004_2019.png",
+        "seasonal_lr_v2/senamhi_seasonal_lapse_rate_timeseries_2004_2019_fixed_pair_bv_recuay_m3of4.png",
+    )
+
+
+def senamhi_png_freezing_level_sf33() -> Path:
+    return resolve_under(
+        SENAMHI,
+        "FL_timeseries_analysis/senamhi_freezing_level_timeseries_1967_1992_sf33.png",
+    )
+
+
+def senamhi_png_freezing_level_sf50() -> Path:
+    return resolve_under(
+        SENAMHI,
+        "FL_timeseries_analysis/senamhi_freezing_level_timeseries_1967_1992_sf50.png",
+    )
+
+
+def senamhi_png_freezing_level_sf67() -> Path:
+    return resolve_under(
+        SENAMHI,
+        "FL_timeseries_analysis/senamhi_freezing_level_timeseries_2004_2019_sf67.png",
+    )
+
+
+def senamhi_png_freezing_level_fixedpair_cajatambo_chavin() -> Path:
+    return resolve_under(
+        SENAMHI,
+        "FL_timeseries_v2/senamhi_freezing_level_timeseries_v2_fixedpair_cajatambo_chavin_1994_2019.png",
+    )
+
+
+def senamhi_png_fl_comparison_caucasus() -> Path:
+    return resolve_under(
+        SENAMHI,
+        "FL_timeseries_analysis/freezing_level_trend_comparison_caucasus_vs_senamhi.png",
+    )
+
+
+def lascar_png_seasonal_timeseries(relaxed: bool) -> Path:
+    if relaxed:
+        return resolve_under(LASCAR, "seasonal_lr_analysis/lascar_seasonal_lr_timeseries_relaxed_2006_2025.png")
+    return resolve_under(LASCAR, "seasonal_lr_analysis/lascar_seasonal_lr_timeseries_2006_2025.png")

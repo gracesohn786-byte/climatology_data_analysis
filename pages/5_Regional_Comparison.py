@@ -14,7 +14,7 @@ APP_DIR = ensure_streamlit_path()
 
 from components.data_loaders import load_caucasus_annual_lr, load_senamhi_annual_lr  # noqa: E402
 from components.layout import df_kwargs  # noqa: E402
-from components.paths import SENAMHI  # noqa: E402
+from components.paths import senamhi_png_fl_comparison_caucasus  # noqa: E402
 from components.static_figures import show_static  # noqa: E402
 
 st.set_page_config(page_title="Regional Comparison", layout="wide")
@@ -67,7 +67,7 @@ st.markdown(
 
 st.subheader("Comparison figure")
 show_static(
-    SENAMHI / "FL_timeseries_analysis" / "freezing_level_trend_comparison_caucasus_vs_senamhi.png",
+    senamhi_png_fl_comparison_caucasus(),
     "Freezing level / trend comparison plot (note SENAMHI extrapolation caveat).",
 )
 

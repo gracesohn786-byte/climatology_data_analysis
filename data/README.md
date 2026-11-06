@@ -1,6 +1,6 @@
-# Bundled derived data (CSV)
+# Bundled data (CSV + reference PNGs)
 
-These files are copies of the project's **derived** analysis outputs so the Streamlit app works on
+These files are copies of the project's **derived** analysis outputs and **original figure PNGs** so the Streamlit app works on
 **Streamlit Community Cloud** when the Git repository contains only the `streamlit_app` tree (no parent
 `Caucasus_Weather_Stations/` folder).
 

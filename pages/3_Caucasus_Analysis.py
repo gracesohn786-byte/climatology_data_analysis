@@ -20,7 +20,15 @@ from components.data_loaders import (  # noqa: E402
     load_caucasus_seasonal_lr_long,
     load_caucasus_seasonal_diag,
 )
-from components.paths import CAUCASUS, REPO_ROOT  # noqa: E402
+from components.paths import (  # noqa: E402
+    CAUCASUS,
+    REPO_ROOT,
+    caucasus_png_annual_lr,
+    caucasus_png_climatology_scatter,
+    caucasus_png_freezing_level,
+    caucasus_png_seasonal_lr_main,
+    caucasus_png_seasonal_lr_old,
+)
 from components.sidebar import year_range_slider  # noqa: E402
 from components.static_figures import show_static_expander  # noqa: E402
 
@@ -83,7 +91,7 @@ with tabs[1]:
         st.plotly_chart(charts.fig_r2_timeseries(annual, y0, y1), **plotly_kwargs())
         show_static_expander(
             "Original research figure — annual LR",
-            CAUCASUS / "annual_LR_analysis" / "caucasus_annual_lapse_rate_timeseries_1959_1992.png",
+            caucasus_png_annual_lr(),
             "Annual lapse rate with OLS trend (1959–1992). Source: annual_LR_analysis.",
         )
 
@@ -105,12 +113,12 @@ with tabs[2]:
                 st.dataframe(diag[["year", "notes", "n_stations_used", "warm_months", "cool_months"]], hide_index=True)
         show_static_expander(
             "Original figure (y-axis 4–8)",
-            CAUCASUS / "seasonal_LR_analysis" / "caucasus_seasonal_lapse_rate_timeseries_1959_1992.png",
+            caucasus_png_seasonal_lr_main(),
             "Warm (red) vs cool (blue) seasonal LR, 1959–1992.",
         )
         show_static_expander(
             "Original figure (auto y-axis)",
-            CAUCASUS / "seasonal_LR_analysis" / "caucasus_seasonal_lapse_rate_timeseries_1959_1992_old.png",
+            caucasus_png_seasonal_lr_old(),
             "Earlier export before fixed y-axis limits.",
         )
 
@@ -128,7 +136,7 @@ with tabs[3]:
         )
         show_static_expander(
             "Original research figure — freezing level",
-            CAUCASUS / "FL_timeseries_analysis" / "caucasus_freezing_level_timeseries_1959_1992.png",
+            caucasus_png_freezing_level(),
             "Annual FL, bootstrap band, linear trend.",
         )
 
@@ -159,10 +167,7 @@ Tmax/Tmin are **proxies**, not fixed solar-hour day/night samples.
     )
     show_static_expander(
         "Original climatology figure",
-        CAUCASUS
-        / "LR_Elevation_vs_Temp_Analysis"
-        / "plot"
-        / "caucasus_lapse_rate_climatology_elevation_vs_temp_1959_1992.png",
+        caucasus_png_climatology_scatter(),
         "Elevation vs temperature climatology scatter with regression table.",
     )
 

@@ -20,7 +20,17 @@ from components.data_loaders import (  # noqa: E402
     load_senamhi_fl_fixedpair,
     load_senamhi_seasonal_long,
 )
-from components.paths import LASCAR, SENAMHI  # noqa: E402
+from components.paths import (  # noqa: E402
+    LASCAR,
+    SENAMHI,
+    lascar_png_seasonal_timeseries,
+    senamhi_png_annual_lr,
+    senamhi_png_freezing_level_fixedpair_cajatambo_chavin,
+    senamhi_png_freezing_level_sf33,
+    senamhi_png_freezing_level_sf50,
+    senamhi_png_freezing_level_sf67,
+    senamhi_png_seasonal_lr_relaxed,
+)
 from components.sidebar import year_range_slider  # noqa: E402
 from components.static_figures import show_static_expander  # noqa: E402
 
@@ -63,12 +73,11 @@ with tabs[1]:
         if slope is not None:
             st.caption(f"Descriptive OLS slope (full series): {slope:.5f} °C/km per year")
         st.plotly_chart(charts.fig_annual_lr(df, yr[0], yr[1], True), **plotly_kwargs())
-        png = (
-            SENAMHI / "annual_LR_analysis" / "senamhi_annual_lapse_rate_1967_1992.png"
-            if window == "historical"
-            else SENAMHI / "annual_LR_analysis" / "senamhi_annual_lapse_rate_2004_2019.png"
+        show_static_expander(
+            "Original figure",
+            senamhi_png_annual_lr(window == "historical"),
+            "SENAMHI annual LR time series.",
         )
-        show_static_expander("Original figure", png, "SENAMHI annual LR time series.")
 
 with tabs[2]:
     window = st.radio("Window ", ["historical", "modern"], horizontal=True, key="seas_w", format_func=lambda w: "1967–1992 (sf50, 3/4 mo)" if w == "historical" else "2004–2019 (sf67, 3/4 mo)")
@@ -81,12 +90,11 @@ with tabs[2]:
         sub = long_df[(long_df["year"] >= yr[0]) & (long_df["year"] <= yr[1])]
         metrics.metric_seasonal_means(sub)
         st.plotly_chart(charts.fig_seasonal_lr(long_df, yr[0], yr[1], show_trend=True), **plotly_kwargs())
-        png_name = (
-            "senamhi_seasonal_lapse_rate_timeseries_1967_1992_relaxed_sf50_m3of4.png"
-            if window == "historical"
-            else "senamhi_seasonal_lapse_rate_timeseries_2004_2019_relaxed_sf67_m3of4.png"
+        show_static_expander(
+            "Original figure",
+            senamhi_png_seasonal_lr_relaxed(window == "historical"),
+            "Relaxed quality rules documented in seasonal_LR_analysis.md.",
         )
-        show_static_expander("Original figure", SENAMHI / "seasonal_LR_analysis" / png_name, "Relaxed quality rules documented in seasonal_LR_analysis.md.")
 
 with tabs[3]:
     variant = st.selectbox(
@@ -118,14 +126,26 @@ with tabs[3]:
         if key == "sf33":
             show_static_expander(
                 "Original figure",
-                SENAMHI / "FL_timeseries_analysis" / "senamhi_freezing_level_timeseries_1967_1992_sf33.png",
+                senamhi_png_freezing_level_sf33(),
                 "Historical FL (extrapolation)—for method comparison only.",
             )
         elif key == "sf67":
             show_static_expander(
                 "Original figure",
-                SENAMHI / "FL_timeseries_analysis" / "senamhi_freezing_level_timeseries_2004_2019_sf67.png",
+                senamhi_png_freezing_level_sf67(),
                 "Modern window FL series.",
+            )
+        elif key == "sf50":
+            show_static_expander(
+                "Original figure",
+                senamhi_png_freezing_level_sf50(),
+                "Historical strict network (≥5 stations)—often sparse years.",
+            )
+        elif key == "fixedpair":
+            show_static_expander(
+                "Original figure — fixed pair",
+                senamhi_png_freezing_level_fixedpair_cajatambo_chavin(),
+                "Cajatambo–Chavin fixed-pair FL (v2 export).",
             )
 
 with tabs[4]:
@@ -139,12 +159,11 @@ with tabs[4]:
         yr = year_range_slider("Lascar seasonal year range", y0, y1, "lascar_yr")
         metrics.metric_seasonal_means(ldf[(ldf["year"] >= yr[0]) & (ldf["year"] <= yr[1])])
         st.plotly_chart(charts.fig_seasonal_lr(ldf, yr[0], yr[1]), **plotly_kwargs())
-        png = (
-            LASCAR / "seasonal_lr_analysis" / "lascar_seasonal_lr_timeseries_relaxed_2006_2025.png"
-            if relaxed
-            else LASCAR / "seasonal_lr_analysis" / "lascar_seasonal_lr_timeseries_2006_2025.png"
+        show_static_expander(
+            "Original figure",
+            lascar_png_seasonal_timeseries(relaxed),
+            "Lascar seasonal warm vs cool LR.",
         )
-        show_static_expander("Original figure", png, "Lascar seasonal warm vs cool LR.")
         for station in ["llanup1", "llanup2", "llanup3", "llanup4", "llanport"]:
             hp = LASCAR / "seasonal_lr_analysis" / f"completeness_heatmap_{station}.png"
             if hp.is_file():
