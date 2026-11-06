@@ -11,12 +11,9 @@ from bootstrap import ensure_streamlit_path  # noqa: E402
 
 APP_DIR = ensure_streamlit_path()
 
-from components.data_loaders import (  # noqa: E402
-    caucasus_completeness_summary_path,
-    load_caucasus_completeness_summary,
-)
+from components.data_loaders import load_caucasus_completeness_summary  # noqa: E402
 from components.layout import df_kwargs, img_kwargs  # noqa: E402
-from components.paths import CAUCASUS  # noqa: E402
+from components.paths import CAUCASUS, caucasus_completeness_summary_path  # noqa: E402
 
 st.set_page_config(page_title="Data & Methods", layout="wide")
 st.title("Data and Methodology")

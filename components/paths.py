@@ -8,24 +8,29 @@ APP_DIR = Path(__file__).resolve().parent.parent
 
 
 def _find_repo_root(start: Path) -> Path:
-    """Directory containing Caucasus_Weather_Stations.
+    """Directory that should contain `Caucasus_Weather_Stations/` (or `streamlit_app/data/` bundle).
 
     Handles:
-    - Local: repo root with streamlit_app/ subfolder
-    - Streamlit Cloud: app may live at repo root (no streamlit_app) or in streamlit_app/
+    - Local: `streamlit_app/` under a repo root that has region folders next to it
+    - Streamlit Cloud: app code may be **at** repo root (`components/` next to `pages/`), so `APP_DIR` is
+      already the clone root — we must **not** fall back to `/mount/src`, which has no data.
     """
-    cur = start.resolve()
-    for _ in range(10):
+    start = start.resolve()
+    cur: Path = start
+    for _ in range(12):
         if (cur / "Caucasus_Weather_Stations").is_dir():
             return cur
-        # e.g. cwd is streamlit_app/ but data dirs are siblings at repo root
         parent = cur.parent
-        if (parent / "Caucasus_Weather_Stations").is_dir():
+        if parent != cur and (parent / "Caucasus_Weather_Stations").is_dir():
             return parent
-        if cur.parent == cur:
+        if parent == cur:
             break
         cur = parent
-    return start.parent
+    # No Caucasus folder found walking up: sensible defaults
+    if start.name == "streamlit_app" and (start / "components").is_dir():
+        return start.parent
+    # App-at-root layout: `start` is already the clone directory (e.g. …/climatology_data_analysis)
+    return start
 
 
 REPO_ROOT = _find_repo_root(APP_DIR)
@@ -60,3 +65,27 @@ def p(*parts: str) -> Path:
 
 def exists(path: Path) -> bool:
     return path.is_file() or path.is_dir()
+
+
+def _first_existing(*candidates: Path) -> Path:
+    """Return the first path that exists; else the first candidate (for error messages)."""
+    for p in candidates:
+        if p.is_file():
+            return p
+    return candidates[0]
+
+
+def caucasus_derived_csv(filename: str) -> Path:
+    """Preferred: `Caucasus_Weather_Stations/derived/<file>`; fallback: same name directly under region folder."""
+    base = CAUCASUS
+    return _first_existing(base / "derived" / filename, base / filename)
+
+
+def caucasus_completeness_summary_path() -> Path:
+    """Audit subfolder, or flat `derived/<summary>.csv` if the user committed that layout."""
+    name = "caucasus_station_completeness_summary_1959_1992.csv"
+    return _first_existing(
+        CAUCASUS / "derived" / "completeness_audit_1959_1992" / name,
+        CAUCASUS / "derived" / name,
+        CAUCASUS / name,
+    )

@@ -43,11 +43,11 @@ diag = load_caucasus_seasonal_diag()
 
 if annual.empty or "year" not in annual.columns:
     st.error(
-        "Caucasus **derived CSVs are missing** from this deployment. "
-        "Either commit **`streamlit_app/data/Caucasus_Weather_Stations/derived/`** (bundled copies for Cloud) or the "
-        "full tree **`Caucasus_Weather_Stations/derived/`** at repository root, then redeploy. "
-        f"If data is present locally, check that the app resolves paths (repository root detected: `{REPO_ROOT}`). "
-        "Expected: `caucasus_annual_lapse_rate_timeseries_1959_1992.csv`."
+        "Caucasus **analysis CSVs are missing** from this deployment. "
+        "Commit **`caucasus_annual_lapse_rate_timeseries_1959_1992.csv`** under either "
+        "`Caucasus_Weather_Stations/derived/` (recommended) or **`Caucasus_Weather_Stations/`** at repo root, "
+        "or use the bundled copy under `streamlit_app/data/Caucasus_Weather_Stations/derived/`. "
+        f"Paths resolve from clone root `{REPO_ROOT}` (folder `Caucasus_Weather_Stations` must live there)."
     )
 
 tabs = st.tabs(["Overview", "Annual LR", "Seasonal LR", "Freezing level", "Climatology", "Completeness"])

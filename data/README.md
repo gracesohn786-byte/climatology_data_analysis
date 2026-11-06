@@ -11,3 +11,5 @@ python streamlit_app/scripts/bundle_data.py
 ```
 
 Commit changes under `streamlit_app/data/` so deployments stay in sync.
+
+**Alternative layout:** you may place the same filenames directly under `Caucasus_Weather_Stations/` (not only under `derived/`); the app checks both.

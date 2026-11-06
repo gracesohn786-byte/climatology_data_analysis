@@ -6,10 +6,16 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-from components.paths import CAUCASUS, LASCAR, SENAMHI
+from components.paths import (
+    CAUCASUS,
+    LASCAR,
+    SENAMHI,
+    caucasus_completeness_summary_path,
+    caucasus_derived_csv,
+)
 
 # Bump when path logic changes so Streamlit Cloud does not serve stale empty cached frames.
-_DATA_CACHE_VERSION = "v3_bundle"
+_DATA_CACHE_VERSION = "v4_repo_root_fix"
 
 
 def _read_csv(path: Path) -> pd.DataFrame:
@@ -20,27 +26,27 @@ def _read_csv(path: Path) -> pd.DataFrame:
 
 @st.cache_data(show_spinner=False)
 def load_caucasus_annual_lr(_ver: str = _DATA_CACHE_VERSION) -> pd.DataFrame:
-    return _read_csv(CAUCASUS / "derived" / "caucasus_annual_lapse_rate_timeseries_1959_1992.csv")
+    return _read_csv(caucasus_derived_csv("caucasus_annual_lapse_rate_timeseries_1959_1992.csv"))
 
 
 @st.cache_data(show_spinner=False)
 def load_caucasus_seasonal_lr_long(_ver: str = _DATA_CACHE_VERSION) -> pd.DataFrame:
-    return _read_csv(CAUCASUS / "derived" / "caucasus_seasonal_lapse_rate_long_1959_1992.csv")
+    return _read_csv(caucasus_derived_csv("caucasus_seasonal_lapse_rate_long_1959_1992.csv"))
 
 
 @st.cache_data(show_spinner=False)
 def load_caucasus_seasonal_diag(_ver: str = _DATA_CACHE_VERSION) -> pd.DataFrame:
-    return _read_csv(CAUCASUS / "derived" / "caucasus_seasonal_lapse_rate_diagnostics_1959_1992.csv")
+    return _read_csv(caucasus_derived_csv("caucasus_seasonal_lapse_rate_diagnostics_1959_1992.csv"))
 
 
 @st.cache_data(show_spinner=False)
 def load_caucasus_fl(_ver: str = _DATA_CACHE_VERSION) -> pd.DataFrame:
-    return _read_csv(CAUCASUS / "derived" / "caucasus_freezing_level_timeseries_1959_1992.csv")
+    return _read_csv(caucasus_derived_csv("caucasus_freezing_level_timeseries_1959_1992.csv"))
 
 
 @st.cache_data(show_spinner=False)
 def load_caucasus_climatology(_ver: str = _DATA_CACHE_VERSION) -> pd.DataFrame:
-    df = _read_csv(CAUCASUS / "derived" / "caucasus_station_annual_climatology_1959_1992.csv")
+    df = _read_csv(caucasus_derived_csv("caucasus_station_annual_climatology_1959_1992.csv"))
     if not df.empty and "station_name" in df.columns:
         df = df[~df["station_name"].astype(str).str.startswith("~$")]
     return df
@@ -48,21 +54,12 @@ def load_caucasus_climatology(_ver: str = _DATA_CACHE_VERSION) -> pd.DataFrame:
 
 @st.cache_data(show_spinner=False)
 def load_caucasus_metadata(_ver: str = _DATA_CACHE_VERSION) -> pd.DataFrame:
-    df = _read_csv(CAUCASUS / "derived" / "station_metadata.csv")
+    df = _read_csv(caucasus_derived_csv("station_metadata.csv"))
     if not df.empty:
         df = df[~df["station_name"].astype(str).str.startswith("~$")].drop_duplicates(
             subset=["station_id"], keep="first"
         )
     return df
-
-
-def caucasus_completeness_summary_path() -> Path:
-    return (
-        CAUCASUS
-        / "derived"
-        / "completeness_audit_1959_1992"
-        / "caucasus_station_completeness_summary_1959_1992.csv"
-    )
 
 
 def load_caucasus_completeness_summary() -> pd.DataFrame:
