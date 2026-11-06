@@ -10,11 +10,11 @@ import streamlit as st
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from bootstrap import ensure_streamlit_path  # noqa: E402
 
-APP_DIR = ensure_streamlit_path()
+ensure_streamlit_path()
 
 from components.data_loaders import load_caucasus_annual_lr, load_senamhi_annual_lr  # noqa: E402
 from components.layout import df_kwargs  # noqa: E402
-from components.paths import senamhi_png_fl_comparison_caucasus  # noqa: E402
+from components.paths import REPO_ROOT, senamhi_png_fl_comparison_caucasus  # noqa: E402
 from components.static_figures import show_static  # noqa: E402
 
 st.set_page_config(page_title="Regional Comparison", layout="wide")
@@ -72,11 +72,23 @@ show_static(
 )
 
 with st.expander("Full comparison write-ups (repository markdown)"):
-    for rel in [
+    # Use REPO_ROOT, not APP_DIR.parent — on Streamlit Cloud the app often lives at clone root, so
+    # APP_DIR.parent becomes /mount/src and these files are never found.
+    writeup_rels = [
         "Senamhi_Weather_Stations/annual_LR_analysis/annual_lr_comparison_caucasus_vs_senamhi_historical.md",
         "Senamhi_Weather_Stations/seasonal_LR_analysis/seasonal_lr_comparison_caucasus_vs_senamhi_historical.md",
-    ]:
-        path = APP_DIR.parent / Path(rel)
+    ]
+    n_shown = 0
+    for rel in writeup_rels:
+        path = REPO_ROOT.joinpath(*Path(rel).parts)
         if path.is_file():
+            n_shown += 1
             st.markdown(f"**{path.name}**")
             st.markdown(path.read_text(encoding="utf-8", errors="replace")[:12000])
+    if n_shown == 0:
+        st.info(
+            "No comparison markdown in this deployment. They live next to the SENAMHI analysis folders in the **full** "
+            f"repository:\n\n`{writeup_rels[0]}`\n\n`{writeup_rels[1]}`\n\n"
+            "Include **`Senamhi_Weather_Stations/`** in the GitHub repo linked to Streamlit, or copy these two `.md` files "
+            "into the deployment root under the same relative paths."
+        )
