@@ -178,6 +178,15 @@ def main() -> None:
     ]:
         _sen_bundle(md_rel, sen_root.joinpath(*Path(md_rel).parts))
 
+    # Caucasus completeness heatmaps (Caucasus Analysis → Completeness tab)
+    heat_src = cauc_root / "completeness_audit" / "monthly_grids_1959-1992_(missing_data)"
+    if heat_src.is_dir():
+        for heat_png in sorted(heat_src.glob("*_1959_1992.png")):
+            _bundle_png(
+                f"Caucasus_Weather_Stations/completeness_audit/monthly_grids_1959-1992_(missing_data)/{heat_png.name}",
+                heat_png,
+            )
+
     def _rel(p: Path) -> str:
         try:
             return str(p.relative_to(repo_root))

@@ -13,7 +13,10 @@ APP_DIR = ensure_streamlit_path()
 
 from components.data_loaders import load_caucasus_completeness_summary  # noqa: E402
 from components.layout import df_kwargs, img_kwargs  # noqa: E402
-from components.paths import CAUCASUS, caucasus_completeness_summary_path  # noqa: E402
+from components.paths import (  # noqa: E402
+    caucasus_completeness_heatmap_pngs,
+    caucasus_completeness_summary_path,
+)
 
 st.set_page_config(page_title="Data & Methods", layout="wide")
 st.title("Data and Methodology")
@@ -83,9 +86,16 @@ if summary.empty:
 else:
     st.dataframe(summary, hide_index=True, **df_kwargs())
 
-heatmap_dir = CAUCASUS / "completeness_audit" / "monthly_grids_1959-1992_(missing_data)"
-pngs = sorted(heatmap_dir.glob("*_1959_1992.png")) if heatmap_dir.is_dir() else []
+pngs = caucasus_completeness_heatmap_pngs()
 if pngs:
-    station = st.selectbox("Station monthly availability heatmap", [p.stem for p in pngs])
-    chosen = next(p for p in pngs if p.stem == station)
-    st.image(str(chosen), caption=station.replace("_", " "), **img_kwargs())
+    labels = {
+        p.stem: p.stem.replace("_monthly_clean_availability_heatmap_1959_1992", "")
+        .replace("_", " ")
+        .title()
+        for p in pngs
+    }
+    pick = st.selectbox("Station monthly availability heatmap", list(labels.keys()), format_func=lambda k: labels[k])
+    chosen = next(p for p in pngs if p.stem == pick)
+    st.image(str(chosen), caption=labels[pick], **img_kwargs())
+else:
+    st.caption("Completeness heatmaps not bundled in this deployment.")

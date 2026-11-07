@@ -266,6 +266,31 @@ def senamhi_comparison_writeup_paths() -> list[Path]:
     return found
 
 
+def caucasus_completeness_heatmap_dir() -> Path:
+    """Directory of per-station `*_1959_1992.png` availability heatmaps.
+
+    Prefer a directory that actually contains those files (bundle may exist without
+    the completeness_audit tree, while the full repo has them).
+    """
+    rel = Path("completeness_audit") / "monthly_grids_1959-1992_(missing_data)"
+    candidates = [
+        CAUCASUS / rel,
+        BUNDLE_DIR / "Caucasus_Weather_Stations" / rel,
+        REPO_ROOT / "Caucasus_Weather_Stations" / rel,
+    ]
+    for d in candidates:
+        if d.is_dir() and any(d.glob("*_1959_1992.png")):
+            return d
+    return candidates[0]
+
+
+def caucasus_completeness_heatmap_pngs() -> list[Path]:
+    d = caucasus_completeness_heatmap_dir()
+    if not d.is_dir():
+        return []
+    return sorted(d.glob("*_1959_1992.png"))
+
+
 def lascar_png_seasonal_timeseries(relaxed: bool) -> Path:
     if relaxed:
         return resolve_under(LASCAR, "seasonal_lr_analysis/lascar_seasonal_lr_timeseries_relaxed_2006_2025.png")

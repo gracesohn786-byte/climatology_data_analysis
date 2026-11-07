@@ -21,8 +21,8 @@ from components.data_loaders import (  # noqa: E402
     load_caucasus_seasonal_diag,
 )
 from components.paths import (  # noqa: E402
-    CAUCASUS,
     REPO_ROOT,
+    caucasus_completeness_heatmap_pngs,
     caucasus_png_annual_lr,
     caucasus_png_climatology_scatter,
     caucasus_png_freezing_level,
@@ -173,7 +173,21 @@ Tmax/Tmin are **proxies**, not fixed solar-hour day/night samples.
 
 with tabs[5]:
     st.markdown("Per-station monthly availability heatmaps (1959–1992 common period).")
-    heat_dir = CAUCASUS / "completeness_audit" / "monthly_grids_1959-1992_(missing_data)"
-    for p in sorted(heat_dir.glob("*_1959_1992.png")) if heat_dir.is_dir() else []:
-        with st.expander(p.stem.replace("_availability_heatmap_1959_1992", "").replace("_", " ").title()):
+    heat_pngs = caucasus_completeness_heatmap_pngs()
+    if not heat_pngs:
+        st.info(
+            "Heatmap PNGs not found in this deployment. Commit "
+            "`streamlit_app/data/Caucasus_Weather_Stations/completeness_audit/` "
+            "(from `python streamlit_app/scripts/bundle_data.py`) or include "
+            "`Caucasus_Weather_Stations/completeness_audit/monthly_grids_1959-1992_(missing_data)/` "
+            "in the GitHub repo."
+        )
+    for p in heat_pngs:
+        label = (
+            p.stem.replace("_monthly_clean_availability_heatmap_1959_1992", "")
+            .replace("_availability_heatmap_1959_1992", "")
+            .replace("_", " ")
+            .title()
+        )
+        with st.expander(label):
             st.image(str(p), **img_kwargs())
