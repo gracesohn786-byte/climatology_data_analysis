@@ -28,9 +28,10 @@ The app reads existing derived CSVs and PNGs under `Caucasus_Weather_Stations/`,
    `python streamlit_app/scripts/bundle_data.py`
 
 3. **Dependencies:** If the Git repo root is the **whole** project folder, `requirements.txt` at that root matches `streamlit_app/requirements.txt`. If you deploy **only** the app folder as the repo root, keep the same `requirements.txt` contents at repo root (Streamlit Cloud always runs `pip install` from the repo root).
+4. **Poster:** Home shows `poster/Stars_2026_poster_preview.png` and a PDF download. Commit both `Stars 2026 poster.pdf` and the preview PNG under `streamlit_app/poster/`. Regenerate the preview after editing the PDF: `pip install pymupdf` then `python streamlit_app/scripts/render_poster_preview.py`.
 
 ## Structure
 
-- `Home.py` — Home page (main entry)
+- `Home.py` — Home page (main entry; poster preview + PDF download)
 - `pages/` — Multipage sections (Overview, Methods, Caucasus, Peru, Comparison, Conclusions)
 - `components/` — Data loaders, charts, static figure helpers

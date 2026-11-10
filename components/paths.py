@@ -54,8 +54,17 @@ LASCAR = _region_or_bundle("Peru_Lascar_EDW_temperature_humidity")
 _poster_candidates = [
     APP_DIR / "poster" / "Stars 2026 poster.pdf",
     REPO_ROOT / "poster" / "Stars 2026 poster.pdf",
+    REPO_ROOT / "poster" / "weather_station_analysis_poster.pdf",
 ]
 POSTER_PDF = next((p for p in _poster_candidates if p.is_file()), _poster_candidates[0])
+
+_poster_preview_candidates = [
+    APP_DIR / "poster" / "Stars_2026_poster_preview.png",
+    REPO_ROOT / "poster" / "Stars_2026_poster_preview.png",
+]
+POSTER_PREVIEW = next(
+    (p for p in _poster_preview_candidates if p.is_file()), _poster_preview_candidates[0]
+)
 
 
 def p(*parts: str) -> Path:

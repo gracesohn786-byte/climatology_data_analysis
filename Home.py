@@ -1,16 +1,14 @@
 """Weather station lapse rate & freezing level — research presentation (home)."""
 from __future__ import annotations
 
-import sys
-from pathlib import Path
-
 import streamlit as st
 
 from bootstrap import ensure_streamlit_path  # noqa: E402
 
 APP_DIR = ensure_streamlit_path()
 
-from components.paths import POSTER_PDF  # noqa: E402
+from components.layout import img_kwargs  # noqa: E402
+from components.paths import POSTER_PDF, POSTER_PREVIEW  # noqa: E402
 
 st.set_page_config(
     page_title="Mountain Lapse Rates & EDW",
@@ -28,32 +26,48 @@ and freezing level (FL) for the **western Greater Caucasus** (1959–1992) and *
 """
 )
 
-col1, col2 = st.columns([2, 1])
-with col1:
-    st.subheader("Research focus")
-    st.markdown(
-        """
+st.subheader("STARS 2026 poster")
+poster_col, dl_col = st.columns([4, 1])
+with dl_col:
+    if POSTER_PDF.is_file():
+        st.download_button(
+            label="Download PDF",
+            data=POSTER_PDF.read_bytes(),
+            file_name="Stars_2026_poster.pdf",
+            mime="application/pdf",
+            type="primary",
+        )
+    else:
+        st.caption("PDF not found in `poster/`.")
+
+if POSTER_PREVIEW.is_file():
+    st.image(
+        str(POSTER_PREVIEW),
+        caption="STARS 2026 research poster (preview).",
+        **img_kwargs(),
+    )
+elif POSTER_PDF.is_file():
+    st.info(
+        "Poster preview image missing. Run "
+        "`python streamlit_app/scripts/render_poster_preview.py` locally, commit "
+        "`streamlit_app/poster/Stars_2026_poster_preview.png`, then redeploy."
+    )
+else:
+    st.info("Poster PDF and preview not found under `poster/`.")
+
+st.divider()
+
+st.subheader("Research focus")
+st.markdown(
+    """
 - **Scientific question:** How does the temperature–elevation relationship (lapse rate) vary in time and
   between warm vs cool seasons, and what does that imply for **Elevation-Dependent Warming (EDW)** and
   freezing-level altitude?
 - **Method:** For each year (or season), fit **elevation = m × T + b** across stations; **LR = −1000/m** (°C/km),
   **FL = b** (m at T = 0 °C). This is a **horizontal network** fit, not a single vertical atmospheric profile.
 - **Navigate** using the sidebar: Overview → Data & Methods → **Caucasus Analysis** → Peru → Regional Comparison → Conclusions.
-        """
-    )
-with col2:
-    st.subheader("Poster reference")
-    if POSTER_PDF.is_file():
-        st.caption(f"STARS 2026 poster: `{POSTER_PDF.relative_to(APP_DIR)}`")
-        with open(POSTER_PDF, "rb") as f:
-            st.download_button(
-                label="Download poster (PDF)",
-                data=f.read(),
-                file_name="Stars_2026_poster.pdf",
-                mime="application/pdf",
-            )
-    else:
-        st.info("Poster PDF not found in `poster/`.")
+"""
+)
 
 st.divider()
 st.markdown(
